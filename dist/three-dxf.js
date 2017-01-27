@@ -267,7 +267,6 @@ var ThreeDxf;
             } else if(entity.type === 'TEXT') {
                 mesh = drawText(entity, data);
             } else if(entity.type === 'MTEXT') {
-                console.log('MTEXT');
                 mesh = drawMultiText(entity, data);
             } else if(entity.type === 'SOLID') {
                 mesh = drawSolid(entity, data);
@@ -426,8 +425,8 @@ var ThreeDxf;
                 material, lineType, vertex, startPoint, endPoint, bulgeGeometry,
                 bulge, i, line;
 
-            geometry.vertices.push(new THREE.Vector3(entity.position.x, entity.position.y, 0));
-            geometry.vertices.push(new THREE.Vector3(entity.position.x + entity.width, entity.position.y, 0));
+            geometry.vertices.push(new THREE.Vector3(0, 0, 0));
+            geometry.vertices.push(new THREE.Vector3(entity.width, 0, 0));
             material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
             line = new THREE.Line(geometry, material);
 
