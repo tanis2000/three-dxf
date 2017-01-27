@@ -404,10 +404,6 @@ var ThreeDxf;
         }
 
         function drawMultiText(entity, data) {
-            if (entity.text == "VAR62") {
-                console.log(entity);
-                console.log(data);
-            }
             var geometry, material, text;
 
             if(!font)
@@ -418,51 +414,73 @@ var ThreeDxf;
             material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) });
 
             text = new THREE.Mesh(geometry, material);
-            // TODO: consider entity.attachmentPoint as it changes the starting position of text
-            var startPoint = new THREE.Vector3(0, 0, 0);
             /*
             Attachment point:
             1 = Top left; 2 = Top center; 3 = Top right; 
             4 = Middle left; 5 = Middle center; 6 = Middle right;
             7 = Bottom left; 8 = Bottom center; 9 = Bottom right
+
+            Top = entity.position.y - entity.height
+            Middle = entity.position.y - entity.height / 2.0
+            Bottom = entity.position.y
+
+            left = entity.position.x
+            center = entity.position.x - entity.width / 2.0
+            right = entity.position.x + entity.width / 2.0
              */
+            var startPoint = new THREE.Vector3(0, 0, 0);
+            startPoint.x = entity.position.x;
+            startPoint.y = entity.position.y;
+            startPoint.z = entity.position.z;
+            var offset = new THREE.Vector3(0, 0, 0);
             if (entity.attachmentPoint == 1) {
-                startPoint.x = entity.position.x;
-                startPoint.y = entity.position.y;
-                startPoint.z = entity.position.z;
+                offset = new THREE.Vector3(0, -entity.height, 0);
             } else if (entity.attachmentPoint == 2) {
-
+                offset = new THREE.Vector3(-entity.width / 2.0, -entity.height, 0);
             } else if (entity.attachmentPoint == 3) {
-                
+                offset = new THREE.Vector3(entity.width / 2.0, -entity.height, 0);
             } else if (entity.attachmentPoint == 4) {
-                startPoint.x = entity.position.x;
-                startPoint.y = entity.position.y + entity.height / 2;
-                startPoint.z = entity.position.z;
+                offset = new THREE.Vector3(0, -entity.height / 2.0, 0);
             } else if (entity.attachmentPoint == 5) {
-                
+                offset = new THREE.Vector3(-entity.width / 2.0, -entity.height / 2.0, 0);
             } else if (entity.attachmentPoint == 6) {
-                
+                offset = new THREE.Vector3(entity.width / 2.0, -entity.height / 2.0, 0);
             } else if (entity.attachmentPoint == 7) {
-                
+                offset = new THREE.Vector3(0, 0, 0);
             } else if (entity.attachmentPoint == 8) {
-                
+                offset = new THREE.Vector3(-entity.width / 2.0, 0, 0);
             } else if (entity.attachmentPoint == 9) {
-                
+                offset = new THREE.Vector3(entity.width / 2.0, 0, 0);
             }
-            text.position = startPoint;
+            text.position.x = startPoint.x + offset.x;
+            text.position.y = startPoint.y + offset.y;
+            text.position.z = startPoint.z + offset.z;
 
+            // Area
+            var rectGeometry = new THREE.PlaneGeometry(entity.width, entity.height);
+            var rectMaterial = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+            var rect = new THREE.Mesh(rectGeometry, rectMaterial);
+            rect.position.x += entity.width/2.0;
+            rect.position.y += entity.height / 2.0;
+            rect.position.z = -1;
+            text.add(rect);
 
+            // Outline
             var geometry = new THREE.Geometry(),
                 color = getColor(entity, data),
-                material, lineType, vertex, startPoint, endPoint, bulgeGeometry,
-                bulge, i, line;
+                material, line;
 
             geometry.vertices.push(new THREE.Vector3(0, 0, 0));
             geometry.vertices.push(new THREE.Vector3(entity.width, 0, 0));
+            geometry.vertices.push(new THREE.Vector3(entity.width, entity.height, 0));
+            geometry.vertices.push(new THREE.Vector3(0, entity.height, 0));
+            geometry.vertices.push(new THREE.Vector3(0, 0, 0));
             material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
             line = new THREE.Line(geometry, material);
 
             text.add(line);
+
+
             return text;
 
         }
