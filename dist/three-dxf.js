@@ -266,6 +266,9 @@ var ThreeDxf;
                 mesh = drawLine(entity, data);
             } else if(entity.type === 'TEXT') {
                 mesh = drawText(entity, data);
+            } else if(entity.type === 'MTEXT') {
+                console.log('MTEXT');
+                mesh = drawMultiText(entity, data);
             } else if(entity.type === 'SOLID') {
                 mesh = drawSolid(entity, data);
             } else if(entity.type === 'POINT') {
@@ -399,6 +402,38 @@ var ThreeDxf;
             text.position.z = entity.startPoint.z;
 
             return text;
+        }
+
+        function drawMultiText(entity, data) {
+            var geometry, material, text;
+
+            if(!font)
+                return console.warn('Text is not supported without a Three.js font loaded with THREE.FontLoader! Load a font of your choice and pass this into the constructor. See the sample for this repository or Three.js examples at http://threejs.org/examples/?q=text#webgl_geometry_text for more details.');
+            
+            geometry = new THREE.TextGeometry(entity.text, { font: font, height: 0, size: entity.height || 12 });
+
+            material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) });
+
+            text = new THREE.Mesh(geometry, material);
+            // TODO: consider entity.attachmentPoint as it changes the starting position of text
+            text.position.x = entity.position.x;
+            text.position.y = entity.position.y;
+            text.position.z = entity.position.z;
+
+
+            var geometry = new THREE.Geometry(),
+                color = getColor(entity, data),
+                material, lineType, vertex, startPoint, endPoint, bulgeGeometry,
+                bulge, i, line;
+
+            geometry.vertices.push(new THREE.Vector3(entity.position.x, entity.position.y, 0));
+            geometry.vertices.push(new THREE.Vector3(entity.position.x + entity.width, entity.position.y, 0));
+            material = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
+            line = new THREE.Line(geometry, material);
+
+            text.add(line);
+            return text;
+
         }
 
         function drawPoint(entity, data) {
