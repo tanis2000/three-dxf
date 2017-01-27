@@ -80,11 +80,13 @@ function onSuccess(evt){
     //  and this discussion https://github.com/mrdoob/three.js/issues/7398 
     var font;
     var loader = new THREE.FontLoader();
-    loader.load( 'fonts/helvetiker_regular.typeface.json', function ( response ) {
+    loader.load( 'fonts/swiss721thin.json', function ( response ) {
         font = response;
-        cadCanvas = new ThreeDxf.Viewer(dxf, document.getElementById('cad-view'), 400, 400, font);
+        cadCanvas = new ThreeDxf.Viewer(dxf, document.getElementById('cad-view'), 800, 600, font);
+        //cadCanvas.setCameraPosition(270, 250, 10);
+        //cadCanvas.setCameraZoom(50);
+        cadCanvas.render();
     });
-    
 }
 
 function handleDragOver(evt) {

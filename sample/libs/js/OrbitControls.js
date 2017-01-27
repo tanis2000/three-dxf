@@ -307,6 +307,19 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
+	this.cleanUp = function() {
+		this.domElement.removeEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+		this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
+		this.domElement.removeEventListener( 'mousewheel', onMouseWheel, false );
+		this.domElement.removeEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+
+		this.domElement.removeEventListener( 'touchstart', touchstart, false );
+		this.domElement.removeEventListener( 'touchend', touchend, false );
+		this.domElement.removeEventListener( 'touchmove', touchmove, false );
+
+		window.removeEventListener( 'keydown', onKeyDown, false );
+	}
+
 	function getAutoRotationAngle() {
 
 		return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
@@ -621,6 +634,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
+	console.log("Adding event listeners");
+	console.log(this.domElement);
 	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
