@@ -53,3 +53,6 @@ Does not yet support:
 
 #### Contributors
 bzuillsmith@gmail.com
+
+#### To convert fonts to js
+http://gero3.github.io/facetype.js/
