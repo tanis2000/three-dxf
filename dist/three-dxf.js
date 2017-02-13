@@ -226,7 +226,7 @@ var ThreeDxf;
         controls.target.x = camera.position.x;
         controls.target.y = camera.position.y;
         controls.target.z = 0;
-        controls.zoomSpeed = 3;
+        controls.zoomSpeed = 0.5;
 
 
         this.render = function() {
@@ -402,9 +402,6 @@ var ThreeDxf;
         }
 
         function drawText(entity, data) {
-            if (entity.text == "VAR55") {
-                console.log(entity);
-            }
             var geometry, material, text, boundingBox;
 
             if(!font)
@@ -506,6 +503,7 @@ var ThreeDxf;
             text.position.y = startPoint.y + offset.y;
             text.position.z = startPoint.z + offset.y;
 
+            /*
             // Debug outline
             var geom = new THREE.Geometry(),
                 color = 0xff0000,
@@ -525,7 +523,8 @@ var ThreeDxf;
             geom.vertices.push(outEnd.sub(text.position));
             mat = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
             line = new THREE.Line(geom, mat);
-
+            */
+           
             text.add(line);
 
             return text;
