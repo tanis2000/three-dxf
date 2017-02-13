@@ -199,8 +199,9 @@ var ThreeDxf;
         camera.position.x = viewPort.center.x;
         camera.position.y = viewPort.center.y;
 
-        var renderer = this.renderer = new THREE.WebGLRenderer();
+        var renderer = this.renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.setSize(width, height);
+        renderer.setPixelRatio(3);
         renderer.setClearColor(0xfffffff, 1);
 
         $parent.append(renderer.domElement);
@@ -386,7 +387,10 @@ var ThreeDxf;
         }
 
         function drawText(entity, data) {
-            var geometry, material, text;
+            if (entity.text == "VAR55") {
+                console.log(entity);
+            }
+            var geometry, material, text, boundingBox;
 
             if(!font)
                 return console.warn('Text is not supported without a Three.js font loaded with THREE.FontLoader! Load a font of your choice and pass this into the constructor. See the sample for this repository or Three.js examples at http://threejs.org/examples/?q=text#webgl_geometry_text for more details.');
@@ -394,11 +398,120 @@ var ThreeDxf;
             geometry = new THREE.TextGeometry(entity.text, { font: font, height: 0, size: entity.textHeight || 12 });
 
             material = new THREE.MeshBasicMaterial({ color: getColor(entity, data) });
+            material.blending = THREE.CustomBlending;
 
             text = new THREE.Mesh(geometry, material);
-            text.position.x = entity.startPoint.x;
-            text.position.y = entity.startPoint.y;
-            text.position.z = entity.startPoint.z;
+
+            geometry.computeBoundingBox();
+            boundingBox = geometry.boundingBox;
+            var width = boundingBox.max.x;
+
+            /*
+
+            startPoint (10) = first alignment point
+            endPoint (11) = second alignment point
+            halign and valign are meaningless without startPoint and endPoint
+
+            halign (72):
+            Horizontal text justification type (optional, default = 0) integer codes (not bit-coded)
+            0 = Left; 1= Center; 2 = Right
+            3 = Aligned (if vertical alignment = 0)
+            4 = Middle (if vertical alignment = 0)
+            5 = Fit (if vertical alignment = 0)
+            See the Group 72 and 73 integer codes table for clarification.
+
+            valign (73):
+            Vertical text justification type (optional, default = 0): integer codes (not bit- coded):
+            0 = Baseline; 1 = Bottom; 2 = Middle; 3 = Top
+            See the Group 72 and 73 integer codes table for clarification.
+
+            Group 73 and 72 integer codes:
+            Group 73   | Group 72 |         |         |         |        |     |
+                       |        0 |       1 |       2 |       3 |      4 |   5 |
+            3 (top)    | TLeft    | TCenter | TRight  |         |        |     |
+            2(middle)  | MLeft    | MCenter | MRight  |         |        |     |
+            1(bottom)  | BLeft    | BCenter | BRight  |         |        |     |
+            0(baseline)| Left     | Center  | Right   | Aligned | Middle | Fit |
+
+            If group 72 and/or 73 values are nonzero then the first alignment point values are 
+            ignored and AutoCAD calculates new values based on the second alignment point and 
+            the length and height of the text string itself (after applying the text style). 
+            If the 72 and 73 values are zero or missing, then the second alignment point is meaningless.
+
+            For sample code refer to: 
+            https://github.com/LibreCAD/LibreCAD/blob/master/librecad/src/lib/engine/rs_text.cpp#L255
+             */
+
+            var startPoint = new THREE.Vector3(0, 0, 0);
+            var offset = new THREE.Vector3(0, 0, 0);
+
+            startPoint.x = entity.startPoint.x;
+            startPoint.y = entity.startPoint.y;
+            startPoint.z = entity.startPoint.z;
+
+            if ((typeof entity.halign === "undefined" || entity.halign === 0) && 
+                (typeof entity.valign === "undefined" || entity.valign === 0)) {
+                // we pretty much don't need to do anything
+            } else {
+                // Horizontal alignment
+                if (typeof halign === "undefined" || halign === 0) {
+                    // Left
+                    offset = new THREE.Vector3(0, 0, 0);
+                } else if (halign === 1) {
+                    // Center
+                    offset = new THREE.Vector3(-width / 2.0, 0, 0);
+                } else if (halign === 2) {
+                    // Right
+                    offset = new THREE.Vector3(-width, 0, 0);
+                } else if (halign === 3) {
+                    // TODO: Aligned
+                    offset = new THREE.Vector3(0, 0, 0);
+                } else if (halign === 4) {
+                    // TODO: Middle
+                    offset = new THREE.Vector3(0, 0, 0);
+                } else if (halign === 5) {
+                    // TODO: Fit
+                    offset = new THREE.Vector3(0, 0, 0);
+                }
+
+                // Vertical alignment
+                if (typeof valign === "undefined" || valign === 0) {
+                    // Baseline
+                    // we apparently don't need to to anything
+                } else if (valign === 1) {
+                    // TODO: Bottom
+                } else if (valign === 2) {
+                    // TODO: Middle
+                } else if (valign === 3) {
+                    // TODO: Top
+                }
+            }
+
+            text.position.x = startPoint.x + offset.x;
+            text.position.y = startPoint.y + offset.y;
+            text.position.z = startPoint.z + offset.y;
+
+            // Debug outline
+            var geom = new THREE.Geometry(),
+                color = 0xff0000,
+                mat, line;
+
+            var outStart = new THREE.Vector3(0, 0, 0);
+            outStart.x = entity.startPoint.x;
+            outStart.y = entity.startPoint.y;
+            outStart.z = entity.startPoint.z;
+
+            var outEnd = new THREE.Vector3(0, 0, 0);
+            outEnd.x = entity.endPoint.x;
+            outEnd.y = entity.endPoint.y;
+            outEnd.z = entity.endPoint.z;
+
+            geom.vertices.push(outStart.sub(text.position));
+            geom.vertices.push(outEnd.sub(text.position));
+            mat = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
+            line = new THREE.Line(geom, mat);
+
+            text.add(line);
 
             return text;
         }
