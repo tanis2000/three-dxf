@@ -523,9 +523,9 @@ var ThreeDxf;
             geom.vertices.push(outEnd.sub(text.position));
             mat = new THREE.LineBasicMaterial({ linewidth: 1, color: color });
             line = new THREE.Line(geom, mat);
-            */
            
             text.add(line);
+            */
 
             return text;
         }
