@@ -48,27 +48,38 @@
 
 
 <div class="container">
-    <div role="form">
-        <div class="form-group">
-            <label for="exampleInputFile">Choose a DXF file</label>
-            <input type="file" accept=".dxf" id="dxf" name="file">
-            <div class="progress progress-striped" style="width: 300px;">
-                <div id="file-progress-bar" class="progress-bar progress-bar-success" role="progressbar" style="width: 0">
+    <div class="row">
+        <div class="col-xs-12">
+            <div role="form">
+                <div class="form-group">
+                    <label for="exampleInputFile">Choose a DXF file</label>
+                    <input type="file" accept=".dxf" id="dxf" name="file">
+                    <div class="progress progress-striped" style="width: 300px;">
+                        <div id="file-progress-bar" class="progress-bar progress-bar-success" role="progressbar" style="width: 0">
+                        </div>
+                    </div>
+                    <div id="file-description" class="help-block"></div>
                 </div>
             </div>
-            <div id="file-description" class="help-block"></div>
+            <div class="col-xs-6">
+                <p>
+                <h2>Instructions</h2>
+                While hovering over the canvas: 
+                <ul>
+                <li>PAN: right click and drag.</li> 
+                <li>ZOOM: mouse wheel to zoom in an out.</li>
+                </ul>
+                 The starting view is
+                    arbitrary at the moment so you may need to zoom out and pan around to find the drawing. </p>
+                <!--<div class="btn btn-danger" onclick="cancelFileRead">Cancel</div>-->
+            </div>
+            <div class="col-xs-6">
+                <p>
+                <h2>Tools</h2>
+                <li><div class="btn btn-primary" onclick="centerDrawing();">Center drawing</div></li> 
+                </ul>
+            </div>
         </div>
-
-        <p>
-        <h2>Instructions</h2>
-        While hovering over the canvas: 
-        <ul>
-        <li>PAN: right click and drag.</li> 
-        <li>ZOOM: mouse wheel to zoom in an out.</li>
-        </ul>
-         The starting view is
-            arbitrary at the moment so you may need to zoom out and pan around to find the drawing. </p>
-        <!--<div class="btn btn-danger" onclick="cancelFileRead">Cancel</div>-->
     </div>
     <div id="cad-view">
 

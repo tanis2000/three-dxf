@@ -205,24 +205,28 @@ var ThreeDxf;
         height = height || $parent.innerHeight();
         var aspectRatio = width / height;
         
-        var viewPort = Helpers.getCameraParametersFromScene(aspectRatio, scene);
+        var viewPort = this.viewPort = Helpers.getCameraParametersFromScene(aspectRatio, scene);
         
-        var camera = new THREE.OrthographicCamera(viewPort.left, viewPort.right, viewPort.top, viewPort.bottom, 1, 19);
+        var camera = this.camera = new THREE.OrthographicCamera(viewPort.left, viewPort.right, viewPort.top, viewPort.bottom, 1, 19);
         camera.position.z = 10;
         camera.position.x = viewPort.center.x;
         camera.position.y = viewPort.center.y;
+        this.originalCameraProjectionMatrix = camera.projectionMatrix.clone();
+        this.cameraOriginalTop = camera.top;
+        this.cameraOriginalBottom = camera.bottom;
+        this.cameraOriginalLeft = camera.left;
+        this.cameraOriginalRight = camera.right;
 
-        var renderer = this.renderer = new THREE.WebGLRenderer({antialias: true});
+        var renderer = this.renderer = this.renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.setSize(width, height);
         var pixelRatio = Helpers.getDevicePixelRatio();
-        console.log("Pixel ratio: " + pixelRatio);
         renderer.setPixelRatio(pixelRatio);
         renderer.setClearColor(0xfffffff, 1);
 
         $parent.append(renderer.domElement);
         $parent.show();
 
-        var controls = new THREE.OrbitControls(camera, parent);
+        var controls = this.controls = new THREE.OrbitControls(camera, parent);
         controls.target.x = camera.position.x;
         controls.target.y = camera.position.y;
         controls.target.z = 0;

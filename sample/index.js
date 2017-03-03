@@ -94,3 +94,26 @@ function handleDragOver(evt) {
     evt.preventDefault();
     evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
 }
+
+function centerDrawing() {
+    var camera = cadCanvas.camera;
+    var viewPort = cadCanvas.viewPort;
+    var controls = cadCanvas.controls;
+    
+    camera.position.z = 10;
+    camera.position.x = viewPort.center.x;
+    camera.position.y = viewPort.center.y;
+    camera.top = cadCanvas.cameraOriginalTop;
+    camera.bottom = cadCanvas.cameraOriginalBottom;
+    camera.left = cadCanvas.cameraOriginalLeft;
+    camera.right = cadCanvas.cameraOriginalRight;
+    camera.updateProjectionMatrix();
+
+    controls.reset();
+    controls.target.x = camera.position.x;
+    controls.target.y = camera.position.y;
+    controls.target.z = 0;
+    controls.update();
+    
+    cadCanvas.render();
+}
