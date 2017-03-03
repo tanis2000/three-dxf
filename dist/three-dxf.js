@@ -764,7 +764,7 @@ var ThreeDxf;
         }
 
         function findExtents(scene) { 
-            for(var child of scene.children) {
+            for(var child in scene.children) {
                 var minX, maxX, minY, maxY;
                 if(child.position) {
                     minX = Math.min(child.position.x, minX);
